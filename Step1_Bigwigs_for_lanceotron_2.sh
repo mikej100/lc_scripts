@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --ntasks=5
 #SBATCH --mem=50G
-#SBATCH --time=00-50:00:00
+#SBATCH --time=00-00:05:00
 #SBATCH --output=%j_%x.out
 #SBATCH --error=%j_%x.err
 #SBATCH --mail-user=lucy.cornell@imm.ox.ac.uk
 #SBATCH --mail-type=end,fail
 
-module load python-cbrg
+module load python-cbrg/202401
 module load lanceotron/20230726
 
 ## This is an example of how to generate bigwigs and peak call fromt hese peaks using lanceotron
@@ -47,11 +47,12 @@ fi
 # Find the bam with the corresponding name within its folder
 bam="$model"/"$model".bam
 
-echo "Starting Bigwig for $bam" ;
-
-# Generates a Bigwig of bin size 1 and RPKM normalised, the preferred input for Lanceotron
-bamCoverage --bam "$bam" -o Peak_analysis/"$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
-
+# Skip this step as it has completed successfully
+#echo "Starting Bigwig for $bam" ;
+#
+## Generates a Bigwig of bin size 1 and RPKM normalised, the preferred input for Lanceotron
+#bamCoverage --bam "$bam" -o Peak_analysis/"$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
+#
 echo "Starting Lanceotron for $bam" ;
 
 # Runs Lanceotron
