@@ -189,20 +189,20 @@ blacklist=$(echo $(ls /project/higgslab/shared/00_analysis_file_bank/Blacklists/
 
 # If you would like blacklist regions removed, add this to the bamcoverage command:
 # --blackListFileName "$blacklist"
-
-bamCoverage -b filtered.bam --normalizeUsing RPKM --smoothLength 100 -p 4 -bs 50 -o filtered.rpkm.bw ;
-
-if [ -s filtered.rpkm.bw ]
-        then
-        echo "RPKM normalized bigwig successfully generated at `date +"%T"`." 
-        echo "See results in filtered.rpkm.bw."
-        echo
-        else
-        echo "bigwig generation unsuccessful."  
-        exit
-fi
-
-# Change names
+# Mike Jennings comment out this block becuase the .bw files are generated in "Step1" script"
+# bamCoverage -b filtered.bam --normalizeUsing RPKM --smoothLength 100 -p 4 -bs 50 -o filtered.rpkm.bw ;
+# 
+# if [ -s filtered.rpkm.bw ]
+#         then
+#         echo "RPKM normalized bigwig successfully generated at `date +"%T"`." 
+#         echo "See results in filtered.rpkm.bw."
+#         echo
+#         else
+#         echo "bigwig generation unsuccessful."  
+#         exit
+# fi
+# 
+# # Change names
 mv filtered.bam ${model}.bam
 mv filtered.bam.bai ${model}.bam.bai
 mv filtered.rpkm.bw ${model}.rpkm.bw
