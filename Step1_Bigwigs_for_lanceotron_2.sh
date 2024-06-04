@@ -1,11 +1,10 @@
 #!/bin/bash
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --ntasks=5
 #SBATCH --mem=50G
-#SBATCH --time=00-00:05:00
+#SBATCH --time=00-10:00:00
 #SBATCH --output=%j_%x.out
 #SBATCH --error=%j_%x.err
-#SBATCH --mail-user=lucy.cornell@imm.ox.ac.uk
 #SBATCH --mail-type=end,fail
 
 module load python-cbrg/202401
