@@ -35,6 +35,8 @@ module load lanceotron/20230726
 ### Run as the following replacing <Model> with your sample name (without .bam)
 
 # sbatch Bigwigs_for_lanceotron.sh <Model> 
+echo "git commit reference"
+git -C ./lc_scripts/ show -s --format=%h%x09%ci%x09%an%x09%s
 
 # Model name from the first input into the script
 if ! model="$1"; then
