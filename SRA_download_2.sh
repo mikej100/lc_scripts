@@ -6,6 +6,7 @@
 #SBATCH --time=06-23:59:59
 
 module load sratoolkit
+vdb-config --interactive
 
 fastq-dump --split-files SRR15970891 ; #ter119_APH_spleen_rep1
 
