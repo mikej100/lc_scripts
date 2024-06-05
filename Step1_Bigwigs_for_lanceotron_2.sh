@@ -34,7 +34,11 @@ module load lanceotron/20230726
 ### Run as the following replacing <Model> with your sample name (without .bam)
 
 # sbatch Bigwigs_for_lanceotron.sh <Model> 
-echo "git commit reference"
+#Create a date and timestamp for when analysis began
+Start_time=`date`
+Time=`date +"%T"`
+workingdir="$(pwd)"
+echo "Show git commit reference:"
 git -C ./lc_scripts/ show -s --format=%h%x09%ci%x09%an%x09%s
 
 # Model name from the first input into the script
@@ -45,13 +49,12 @@ fi
 
 # Find the bam with the corresponding name within its folder
 bam="$model"/"$model".bam
+# 
+echo "Starting Bigwig for $bam" ;
 
-# Skip this step as it has completed successfully
-#echo "Starting Bigwig for $bam" ;
-#
-## Generates a Bigwig of bin size 1 and RPKM normalised, the preferred input for Lanceotron
-#bamCoverage --bam "$bam" -o Peak_analysis/"$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
-#
+# Generates a Bigwig of bin size 1 and RPKM normalised, the preferred input for Lanceotron
+bamCoverage --bam "$bam" -o Peak_analysis/"$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
+
 echo "Starting Lanceotron for $bam" ;
 
 # Runs Lanceotron
