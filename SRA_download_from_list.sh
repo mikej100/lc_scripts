@@ -2,8 +2,8 @@
 #SBATCH --partition=long
 #SBATCH --job-name=SRA-download-from-list
 #SBATCH --ntasks=4
-#SBATCH --mem=120G
-#SBATCH --time=00-01:00:00
+#SBATCH --mem=12G
+#SBATCH --time=00-05:00:00
 
 # Download SRA files specified by list in current folder
 # ======================================================
@@ -38,9 +38,9 @@ module load sratoolkit
 
 echo "SRA ids: "${sra_ids[@]}
 for sra_id in ${sra_ids[@]}; do
-    fastq-dump --split-files $sra_id
-    mv $sra_id"_1.fast1"  $model"_R1"
-    mv $sra_id"_2.fast1"  $model"_R2"
+    fastq-dump --split-files $sra_id 
+    mv $sra_id"_1.fastq"  $sra_id"_R1.fastq"
+    mv $sra_id"_2.fastq"  $sra_id"_R2".fastq
 done
 
 for file in *.fastq ; do
@@ -48,5 +48,7 @@ for file in *.fastq ; do
     gzip $file ;
 done
 
-
-# for file in *.fastq.gz ; do echo "$file" ; done
+for file in *.fastq ; do
+    echo "G-zipping $file" ;
+    gzip $file ;
+done

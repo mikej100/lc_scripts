@@ -8,6 +8,13 @@
 #SBATCH --mail-user=
 #SBATCH --mail-type=end,fail
 
+# Based on script from Lucy Cornell, modified by Mike Jennings for use with
+# lanceotron.
+# Changes are:
+#       not having 8x lane fastq from same samples. 
+#          I need to understand this requirement
+#       skipped the bamCoverage, as this step is in next script.
+
 ## NEEDS TO HAVE 8x LANE fastq.gz from the same sample from FILES IN SAME FOLDER TO RUN ###
 ## 4 sequencing lanes for paired end reads
 
@@ -26,11 +33,10 @@ Start_time=`date`
 Time=`date +"%T"`
 workingdir="$(pwd)"
 
-#Genome path
-if ! genome="$1"; then
-	echo "Genome missing"
-	exit 1
-fi
+#Genome path, default to mm39
+echo "hi"
+genome="${1:-'mm39'}
+echo $genome
 
 #Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
 if [ "$genome" == "mm9" ] || [ "$genome" == "mm10" ] || [ "$genome" == "mm39" ]; then 
@@ -67,7 +73,7 @@ module list #Prints list of modules and versions
 echo -e "Input fastqs:\n$(ls *.fastq.gz | xargs -n1)" ;
 echo
 
-wConcatenate _R1 and _R2 fastq files into a single R1 and a single R2 file.
+#Concatenate _R1 and _R2 fastq files into a single R1 and a single R2 file.
 nohup cat *_R1* > R1.fastq.gz
 nohup cat *_R2* > R2.fastq.gz
 
