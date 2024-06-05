@@ -39,8 +39,8 @@ module load sratoolkit
 echo "SRA ids: "${sra_ids[@]}
 for sra_id in ${sra_ids[@]}; do
     fastq-dump --split-files $sra_id
-    mv $sra_id"_1.fast1  $model"_R1
-    mv $sra_id"_2.fast1  $model"_R2
+    mv $sra_id"_1.fast1"  $model"_R1"
+    mv $sra_id"_2.fast1"  $model"_R2"
 done
 
 for file in *.fastq ; do
