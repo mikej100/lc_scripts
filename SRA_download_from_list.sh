@@ -36,16 +36,12 @@ Time=`date +"%T"`
 module load sratoolkit
 # vdb-config --interactive
 
+#TODO Understand requirement for creating meaningful filename
 echo "SRA ids: "${sra_ids[@]}
 for sra_id in ${sra_ids[@]}; do
     fastq-dump --split-files $sra_id 
     mv $sra_id"_1.fastq"  $sra_id"_R1.fastq"
     mv $sra_id"_2.fastq"  $sra_id"_R2".fastq
-done
-
-for file in *.fastq ; do
-    echo "G-zipping $file" ;
-    gzip $file ;
 done
 
 for file in *.fastq ; do

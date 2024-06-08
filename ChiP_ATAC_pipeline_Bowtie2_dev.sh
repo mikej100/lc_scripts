@@ -2,10 +2,10 @@
 #SBATCH --partition=long
 #SBATCH --ntasks=5
 #SBATCH --mem=50G
-#SBATCH --time=00-50:00:00
-#SBATCH --output=%j_%x.out
-#SBATCH --error=%j_%x.err
-#SBATCH --mail-user=
+#SBATCH --time=00-10:00:00
+###SBATCH --output=%j_%x.out
+###SBATCH --error=%j_%x.err
+###SBATCH --mail-user=
 #SBATCH --mail-type=end,fail
 
 # Based on script from Lucy Cornell, modified by Mike Jennings for use with
@@ -34,8 +34,7 @@ Time=`date +"%T"`
 workingdir="$(pwd)"
 
 #Genome path, default to mm39
-echo "hi"
-genome="${1:-'mm39'}
+genome="${1:-mm39}"
 echo $genome
 
 #Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
