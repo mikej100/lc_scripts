@@ -38,7 +38,7 @@ echo "Here are repository; branch; most recent commit reference, date, author an
 git -C $(dirname ${BASH_SOURCE}) remote -v | grep fetch
 git -C $(dirname ${BASH_SOURCE}) rev-parse --abbrev-ref HEAD
 git -C $(dirname ${BASH_SOURCE}) show -s --format=%h%x09%ci%x09%an%x09%sk
-exit
+
 #Genome path, default to mm39
 genome="${1:-mm39}"
 echo $genome
