@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --ntasks=5
-#SBATCH --mem=50G
+#SBATCH --mem=10G
 #SBATCH --time=00-10:00:00
 #SBATCH --output=slurm/%j_%x.out
 #SBATCH --error=slurm/%j_%x.err
 ###SBATCH --mail-user=
-#SBATCH --mail-type=end,fail
+#SBATCH --mail-type=fail
 
 # Based on ChiiP_ATAC_pipeline_Bowtie2_fast.sh script from Lucy Cornell, modified by Mike Jennings for use with
 # lanceotron.
@@ -98,8 +98,8 @@ echo
 
 # Read SRA_ids from a a config file. One per line.
 mapfile -t sra_ids < sra_ids.cfg
-
 for sra_id in ${sra_ids[@]}; do
+    
     echo "${NOW} Calling bowtie for ${sra_id}"
     bowtie2 -k 2 -N 1 -p 4 \ -1 ${sra_id}_R1.fastq.gz \ -2 ${sra_id}_R2.fastq.gz \
         --maxins 1000 \
@@ -130,11 +130,12 @@ for sra_id in ${sra_ids[@]}; do
         mv ${sra_id}_filtered.rpkm.bw   ${sra_id}.rpkm.bw
 
     echo "${NOW} Calling bamCoverage for ${sra_id}"
-        bamCoverage --bam "$bam" \
-                -o "$model".bw \
-                --extendReads \
-                -bs 1 \
-                --normalizeUsing RPKM
+    
+    bamCoverage --bam "${sra_id}.bam" \
+            -o "${sra_id}.bw" \
+            --extendReads \
+            -bs 1 \
+            --normalizeUsing RPKM
 done
 
 module unload python-base
