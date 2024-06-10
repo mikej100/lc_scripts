@@ -3,25 +3,17 @@
 #SBATCH --ntasks=5
 #SBATCH --mem=50G
 #SBATCH --time=00-10:00:00
-###SBATCH --output=%j_%x.out
-###SBATCH --error=%j_%x.err
+#SBATCH --output=slurm/%j_%x.out
+#SBATCH --error=slurm/%j_%x.err
 ###SBATCH --mail-user=
 #SBATCH --mail-type=end,fail
 
-# Based on script from Lucy Cornell, modified by Mike Jennings for use with
+# Based on ChiiP_ATAC_pipeline_Bowtie2_fast.sh script from Lucy Cornell, modified by Mike Jennings for use with
 # lanceotron.
 # Changes are:
 #       not having 8x lane fastq from same samples. 
 #          I need to understand this requirement
 #       skipped the bamCoverage, as this step is in next script.
-
-## NEEDS TO HAVE 8x LANE fastq.gz from the same sample from FILES IN SAME FOLDER TO RUN ###
-## 4 sequencing lanes for paired end reads
-
-### Things to check before run:
-####### Change working directory to where the fastqs are, please note the name of the directory is used to identify output files so make this name informative
-####### Provide the genome build the analysis is running on
-####### Check the module versions, early versions of modules may not work with this script
 ####### If you want to mask blacklist regions, see line 190 
 
 ####### To RUN: sbatch ChiP_ATAC_pipeline_Bowtie2_fast.sh <genome>
@@ -33,6 +25,9 @@ Start_time=`date`
 Time=`date +"%T"`
 workingdir="$(pwd)"
 
+NOW=`date +"%Y-%m-%dT%T"`
+
+echo ${NOW} Starting $(basename "${BASH_SOURCE}")
 #Genome path, default to mm39
 genome="${1:-mm39}"
 echo $genome
@@ -73,26 +68,26 @@ echo -e "Input fastqs:\n$(ls *.fastq.gz | xargs -n1)" ;
 echo
 
 #Concatenate _R1 and _R2 fastq files into a single R1 and a single R2 file.
-nohup cat *_R1* > R1.fastq.gz
-nohup cat *_R2* > R2.fastq.gz
+# nohup cat *_R1* > R1.fastq.gz
+# nohup cat *_R2* > R2.fastq.gz
 
-if [ -s R1.fastq.gz ]
-	then
-	echo "Read 1 reads successfully concatenated at `date +"%T"`."
-        echo
-	else
-	echo "R1 concatenation unsuccessfull."  
-	exit
-fi
+# if [ -s R1.fastq.gz ]
+# 	then
+# 	echo "Read 1 reads successfully concatenated at `date +"%T"`."
+#         echo
+# 	else
+# 	echo "R1 concatenation unsuccessfull."  
+# 	exit
+# fi
 
-if [ -s R2.fastq.gz ]
-        then
-        echo "Read 2 reads successfully concatenated at `date +"%T"`."
-        echo
-        else
-        echo "R2 concatenation unsuccessfull."  
-        exit
-fi
+# if [ -s R2.fastq.gz ]
+#         then
+#         echo "Read 2 reads successfully concatenated at `date +"%T"`."
+#         echo
+#         else
+#         echo "R2 concatenation unsuccessfull."  
+#         exit
+# fi
 
 #Use bowtie2 to align the fastq files to the designated genome (set as $genome).
 #Currently, allow reads which multi-map to max 2 regions to continue into downstream analysis. Change -k to alter this.
@@ -101,81 +96,46 @@ fi
 #Currently, maximum fragment length allowed is 1000bp. Change --maxins if you want to alter this e.g. perhaps change to 150bp if you want
 #only mononucleosomes.
 
-bowtie2 -k 2 -N 1 -p 4 \ -1 R1.fastq.gz \ -2 R2.fastq.gz \
---maxins 1000 \
--x /databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome \
--S alignment.sam
+# Read SRA_ids from a a config file. One per line.
+mapfile -t sra_ids < sra_ids.cfg
 
-if [ -s alignment.sam ]
-        then
-        echo "Alignment successful at `date +"%T"`." 
-        echo "See results in alignment.sam."
-        echo
-        else
-        echo "Alignment unsuccessful."  
-        exit
-fi
+for sra_id in ${sra_ids[@]}; do
+    echo "${NOW} Calling bowtie for ${sra_id}"
+    bowtie2 -k 2 -N 1 -p 4 \ -1 ${sra_id}_R1.fastq.gz \ -2 ${sra_id}_R2.fastq.gz \
+        --maxins 1000 \
+        -x /databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome \
+        -S ${sra_id}_alignment.sam
 
-rm -rf *.fastq
+        #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
+    echo "${NOW} Calling samtools::view for ${sra_id}"
+        samtools view -@8 -bS -F4 -o ${sra_id}_mapped.bam ${sra_id}_alignment.sam ;
 
-#Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
+        #Sort the reads in mapped.bam by coordinate.
+    echo "${NOW} Calling samtools::sort for ${sra_id}"
+        samtools sort ${sra_id}_mapped.bam -@8 -o ${sra_id}_mapped.srtC ;
+        rm -rf ${sra_id}_mapped.bam
 
-samtools view -@8 -bS -F4 -o mapped.bam alignment.sam ;
+        #Remove PCR duplicates.
+    echo "${NOW} Calling samtools::rmdup for ${sra_id}"
+        samtools rmdup ${sra_id}_mapped.srtC ${sra_id}_filtered.bam ; 
+        rm -rf ${sra_id}_mapped.srtC *.txt *.histogram *.hist
 
-if [ -s mapped.bam ]
-        then
-        echo "Read filtering successful at `date +"%T"`.\n"
-        echo "See results in mapped.bam."
-        echo
-        else
-        echo "Read filtering unsuccessful."   
-        exit
-fi
+        #Index the bam file
+    echo "${NOW} Calling samtools::index for ${sra_id}"
+        samtools index ${sra_id}_filtered.bam  
 
-#Sort the reads in mapped.bam by coordinate.
+    echo "${NOW} renaming bam files for ${sra_id}"
+        mv ${sra_id}_filtered.bam       ${sra_id}.bam
+        mv ${sra_id}_filtered.bam.bai   ${sra_id}.bai
+        mv ${sra_id}_filtered.rpkm.bw   ${sra_id}.rpkm.bw
 
-samtools sort mapped.bam -@8 -o mapped.srtC ;
-
-if [ -s mapped.srtC ]
-        then
-        echo "Read sorting successful at `date +"%T"`. "
-        echo "See results in mapped.srtC."
-        echo
-        else
-        echo "Read sorting unsuccessful."  
-        exit
-fi
-
-rm -rf mapped.bam
-
-#Remove PCR duplicates.
-
-samtools rmdup mapped.srtC filtered.bam ; 
-
-if [ -s filtered.bam ]
-        then
-        echo "PCR duplicates removal successful at `date +"%T"`. "
-        echo "See results in filtered.bam."
-        echo
-        else
-        echo "PCR duplicates removal unsuccessful."   
-        exit
-fi
-
-rm -rf mapped.srtC *.txt *.histogram *.hist
-
-#Index the bam file
-samtools index filtered.bam ; 
-
-if [ -s filtered.bam.bai ]
-        then
-        echo "filtered.bam successfully indexed at `date +"%T"`. "
-        echo "See results in filtered.bam.bai."
-        echo
-        else
-        echo "bam indexing unsuccessful."   
-        exit
-fi
+    echo "${NOW} Calling bamCoverage for ${sra_id}"
+        bamCoverage --bam "$bam" \
+                -o "$model".bw \
+                --extendReads \
+                -bs 1 \
+                --normalizeUsing RPKM
+done
 
 module unload python-base
 
@@ -208,19 +168,15 @@ blacklist=$(echo $(ls /project/higgslab/shared/00_analysis_file_bank/Blacklists/
 # fi
 # 
 # # Change names
-mv filtered.bam ${model}.bam
-mv filtered.bam.bai ${model}.bam.bai
-mv filtered.rpkm.bw ${model}.rpkm.bw
-
-echo "Files renamed"
-echo
-
 #Get rid of intermediate files to save space. But KEEP filtered.bam for Macs2 analysis (need bam for peak calling and downstream analysis).
-rm -rf  filtered.bg filtered.srt.bg mapped.srtC.bam alignment.sam ;
+rm -rf  *_filtered.bg \
+        *_filtered.srt.bg \
+        *_mapped.srtC.bam \
+        *_alignment.sam ;
 rm *fq*
 
-echo -e "Intermediate files removed at `date +"%T"`\n" ;
+echo -e "${NOW} Intermediate files removed at `date +"%T"`\n" ;
 echo
-echo -e "ChIP pipeline finished `date +"%T"`"
+echo -e "${NOW} ChIP pipeline finished `date +"%T"`"
 echo
 exit ;

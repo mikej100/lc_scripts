@@ -8,16 +8,28 @@ source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_
 
 model=("ATAC" "H3K4me1" "H3K4me3" "Med1")
 
+echo "Models:"
 echo $model
 
 for i in "${!model[@]}"; do
     echo ${model[$i]}
+    echo $i
     bw_f[$i]="../"${model[$i]}"/"${model[$i]}".bw"
 done
 
+echo "\nBigwig filenames:"
 for f in "${bw_f[@]}"; do
     echo $f
 done
+
+echo "Starting multiBigwigSummary"
+
+multiBigwigSummary BED-file \
+    -b $bw_f[0] $bw_f[1] $bw_f[2] $bw_f[3] \
+    -o mbw_results.npq \
+    -l model
+    --BED ".."$model[0]""/""$model[0]".bw
+
 
 
 

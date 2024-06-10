@@ -2,12 +2,12 @@
 #SBATCH --partition=long
 #SBATCH --ntasks=5
 #SBATCH --mem=50G
-#SBATCH --time=00-00:01:00
+#SBATCH --time=00-10:00:00
 #SBATCH --output=%j_%x.out
 #SBATCH --error=%j_%x.err
 #SBATCH --mail-type=end,fail
 
-module load python-cbrg
+module load python-cbrg/202401
 module load lanceotron/20230726
 #
 # Generate 
@@ -62,7 +62,7 @@ bamCoverage --bam "$bam" -o "$model".bw --extendReads -bs 1 --normalizeUsing RPK
 echo "Starting Lanceotron for $bam" ;
 
 # Runs Lanceotron
-lanceotron callPeaks "$model".bw -f /Lanceotron_outputs ;
+lanceotron callPeaks "$model".bw -f Lanceotron_outputs ;
 
 # This filters peak calls to only those of a score greater than 0.8
 echo "Taking top scoring peaks" ;
