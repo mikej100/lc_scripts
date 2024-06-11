@@ -4,12 +4,10 @@
 #SBATCH --ntasks=5
 #SBATCH --mem=10G
 #SBATCH --time=00-10:00:00
-#SBATCH --output=slurm/%j_%x.out ### If does not exist job will fail with exit code 53
-### Send err to same file for debugging use
+#SBATCH --output=slurm/%j_%x.out 
 #SBATCH --error=slurm/%j_%x.out
 ###SBATCH --mail-user=
-#SBATCH --mail-type=fail
-
+##SBATCH --mail-type=fail
 # Based on ChiiP_ATAC_pipeline_Bowtie2_fast.sh script from Lucy Cornell, modified by Mike Jennings for use with
 # lanceotron.
 # Changes are:
@@ -31,7 +29,6 @@ NOW=`date +"%Y-%m-%dT%T"`
 
 echo ${NOW} Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
-echo "git info using \$SCRIPTS"
 ${SCRIPTS}/scripts_info.sh || true
 # echo
 # echo "Script file information from git"

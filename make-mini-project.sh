@@ -14,27 +14,28 @@
 
 module load samtools/1.17
 
+# Define region of the alignment which will be used as
+# the subset for the mini-project.
 region_agtad_mm9="chr11:32000000-33700000"
 mini_region=$region_agtad_mm9
 
+# mini-project directory
+mp=$PWD
+
+# Get the list of models
 mapfile -t model < models.cfg
 
-mp=$PWD
-echo "location of mini-project $mp"
-
-for i in ${!model[@]}; do
-    mkdir -p ${model[$i]}/slurm
-done
-
+# loop through each model directory
+#     create slurm folder 
+#     copy the sample config file 
+#     read the list of samples from config
+#     loop through each sample in the model
+#         create a mini-bam file with the region subset
 for m in ${model[@]}; do
-    echo "working on mini-model $m"
+    mkdir -p ${m}/slurm
     cd  ${mp}/${m}
-    echo "Moved to directory ${PWD##}"
     cp "../../${m}/sra_ids.cfg" .
-    
-
     mapfile -t sra_ids < sra_ids.cfg
-    
     for s in ${sra_ids[@]}; do
         samtools view \
             ../../${m}/${s}.bam \

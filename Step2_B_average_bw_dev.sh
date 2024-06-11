@@ -1,21 +1,30 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --ntasks=5
+#SBATCH --output=slurm/%j_%x.out 
+#SBATCH --error=slurm/%j_%x.out
 
 # This is a script to average 2 or 3 bigwigs e.g. two reps of the same ChIP or ATAC.
 # Bigwigs must have already been generated
 # Use in an environment with wiggletools and ucsc-wigtobigwig 
 # mamba activate bed_sam_deep_tools
 
+
+chr_sizes_mm9="/databank/igenomes/Mus_musculus/UCSC/mm9/Sequence/WholeGenomeFasta/chr_sizes.txt"
+chr_sizes_mm39="/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/WholeGenomeFasta/chr_sizes.txt"
+chr_sizes=$chr_sizes_mm39
+
 source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
 
+now() {
+    date +"%Y-%m-%dT%T"
+}
 
-NOW=`date +"%Y-%m-%dT%T"`
-
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
+echo ${now} Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
-echo "git info using \$SCRIPTS"
-${SCRIPTS}/scripts_info.sh || true
+#${SCRIPTS}/scripts_info.sh || true
+
+echo "${now} DEBUG returned to main script"
 
 
 #Model name is the folder name
@@ -34,37 +43,26 @@ mapfile -t sra_ids < sra_ids.cfg
 echo "SRA ids: "${sra_ids[@]}
 output_file="$model"
 
+fnames=$(printf %s.bw" " "${sra_ids[@]}")
 
-for sra_id in ${sra_ids[@]}; do
-    
-done
-
-exit
-file_1="$2"
-file_2="$3"
-file_3="$4"
-
-echo "Input bigwigs : "$file_1" "$file_2" "$file_3" " ;
-echo 
-
-echo "Starting Wiggletools mean"
-echo
-
-if [ -z $4 ]; then
-	wiggletools mean "$file_1" "$file_2" > "$output_file".temp.wig
-else
-	wiggletools mean "$file_1" "$file_2" "$file_3" > "$output_file".temp.wig
-fi ;
-
-echo "Starting wigToBigWig"
-echo 
-
-wigToBigWig "$output_file".temp.wig /databank/igenomes/Mus_musculus/UCSC/mm9/Sequence/WholeGenomeFasta/chr_sizes.txt "$output_file"
-
-rm "$output_file".temp.wig
-
-echo "Finished"
-echo 
-
-exit ;
- 
+# 
+# file_1="$2"
+# file_2="$3"
+# file_3="$4"
+# 
+echo "Input bigwigs : $fnames"
+# 
+echo "${now} Starting Wiggletools mean"
+wiggletools mean ${fnames} > "$output_file".temp.wig 
+# 	wiggletools mean "$file_1" "$file_2" > "$output_file".temp.wig
+# else
+# 	wiggletools mean "$file_1" "$file_2" "$file_3" > "$output_file".temp.wig
+# fi ;
+# 
+echo "${now} Starting wigToBigWig"
+wigToBigWig "$output_file".temp.wig $chr_sizes "$output_file" ]
+# 
+# rm "$output_file".temp.wig
+# 
+ echo "${now}Finished"
+ echo 

@@ -32,7 +32,14 @@ If this directory does not exist, batch job will fail immediately with exit code
 
 [to be developed]`sample_names.cfg` file containing the sample names to be integrate
 will be used to name the individual .sam and .bam files
-Prior to developing this feature, the sra_id is used 
+Prior to developing this feature, the sra_id is used
+
+Analysis subdirectory
+---------------------
+Create subdirectory in the project with a name for the analysis to perform
+
+Add a `models.cfg` with the names of the models to include in the analysis. 
+This can be a subset of the models in the project.
 
 Example directory structure
 ----------------------------
