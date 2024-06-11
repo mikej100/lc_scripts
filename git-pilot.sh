@@ -8,6 +8,9 @@
 #SBATCH --error=slurm/%j_%x.out
 ##SBATCH --mail-type=fail
 #SBATCH --export=TEST_VAR="test value"
+#
+# Temporary script for feature development.
+#
 echo "Test environment variable value: ${TEST_VAR}"
 
 now() {

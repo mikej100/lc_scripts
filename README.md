@@ -123,32 +123,49 @@ Here is an example project structure part-way through running the scripts.
 Run the scripts
 ===============
 
-To run the upstream pipeline scripts (which contain Q, B, P in their name) `cd` to the subdirectory
- of the model. Then type the script. For example
+To run the upstream pipeline scripts (which contain Q, B, P in their name) `cd`
+to the subdirectory
+of the model. Then type the script. For example
 
         sbatch $SCRIPTS/Step1_B_fastq2bw.sh
 If you have added $SCRIPTS to your $PATH, then just
 
         sbatch Step1_B_fastqbw.sh
 
-Slurm logs will be written to the subfolder `/slurm` and the output file created in the current directory or subdirectories. You can use the utilities `sjobs` to view the jobs, `stree` to view data in the directory tree and `stidy-up` to tidy away slurm log files to the slurm subdirectory if you have from running other scripts.
+Slurm logs will be written to the subfolder `/slurm` and the output file created
+in the current directory or subdirectories. You can use the utilities `sjobs`
+to view the jobs, `stree` to view data in the directory tree and `stidy-up` 
+to tidy away slurm log files to the slurm subdirectory if you have from
+running other scripts.
 
-The slurm log contains information about the precise version of the script which is run. This information can be used to inpsect and  a copy of that version of the script. Note that this relies on having committed any changes to git.
+The slurm log contains information about the precise version of the script
+ which is run. 
+This information can be used to inpsect and  a copy of that version of the script. 
+Note that this relies on having committed any changes to git.
+Example information:
+>Script version control: latest commit informationk\
+>github repository: https://github.com/mikej100/lc_scripts.git  Branch: main\
+>Short hash: c84dcd8. Date: 2024-06-11 23:13:47 +0100. Author: Mike Jennings.\
+>Title: Development work to each step in the pipeline.
 
 
 Utilities
 =========
 Slurm utilities
 ---------------
-`sjobs` - list your jobs from today, includes exit codes
+`sjobs` - list your jobs from today, including exit codes
 
-`stidy-up` - move things that look like slurm job output into subfolder named slurm. Create slurm folder if it does not exist.
+`stidy-up` - move things that look like slurm job output into subfolder named
+ `slurm`. Create slurm folder if it does not exist.
 
-`stree` - show tree of directories and files excluding things that look like slurm output
+`stree` - show tree of directories and files excluding things that look like
+ slurm output
 
 Other utitilities
 -----------------
 
-`make-mini-project.sh` - create a subproject with tiny subset of the data so that you can test out analysis and scripts. Currently, this is set up to select .bam data for the mouse alpha globin TAD.
+`make-mini-project.sh` - create a subproject with tiny subset of the data
+ so that you can test out analysis and scripts. Currently, this is set up to
+  select .bam data for the mouse alpha globin TAD.
 
 `zip-fastq.sh` - gz zip any .fastq files in current directory.
