@@ -1,10 +1,12 @@
 #!/bin/bash
 #SBATCH --partition=long
+###SBATCH --job-name=SRA
 #SBATCH --ntasks=5
 #SBATCH --mem=10G
 #SBATCH --time=00-10:00:00
-#SBATCH --output=slurm/%j_%x.out
-#SBATCH --error=slurm/%j_%x.err
+#SBATCH --output=slurm/%j_%x.out ### If does not exist job will fail with exit code 53
+### Send err to same file for debugging use
+#SBATCH --error=slurm/%j_%x.out
 ###SBATCH --mail-user=
 #SBATCH --mail-type=fail
 
@@ -28,17 +30,23 @@ workingdir="$(pwd)"
 NOW=`date +"%Y-%m-%dT%T"`
 
 echo ${NOW} Starting $(basename "${BASH_SOURCE}")
+# Show git info for scripts folder
+echo "git info using \$SCRIPTS"
+${SCRIPTS}/scripts_info.sh || true
+exit
+# echo
+# echo "Script file information from git"
+# echo "================================"
+# 
+# echo "Here are repository; branch; most recent commit reference, date, author and comment"
+# 
+# SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+# git -C "$SCRIPT_DIR" remote -v | grep fetch
+# # git -C $(dirname ${BASH_SOURCE}) rev-parse --abbrev-ref HEAD
+# # git -C $(dirname ${BASH_SOURCE}) show -s --format=%h%x09%ci%x09%an%x09%sk
 
-echo
-echo "Script file information from git"
-echo "================================"
 
-echo "Here are repository; branch; most recent commit reference, date, author and comment"
-
-git -C $(dirname ${BASH_SOURCE}) remote -v | grep fetch
-git -C $(dirname ${BASH_SOURCE}) rev-parse --abbrev-ref HEAD
-git -C $(dirname ${BASH_SOURCE}) show -s --format=%h%x09%ci%x09%an%x09%sk
-
+#git -C "${SCRIPT_DIR}ASH_SOURCE})" rev-parse --abbrev-ref HEAD  
 #Genome path, default to mm39
 genome="${1:-mm39}"
 echo $genome
@@ -74,31 +82,7 @@ module purge #Unloads all modules from the users environment
 module load samtools/1.17 bowtie2/2.4.2 bedtools/2.25.0 ucsctools/385 trim_galore/0.6.10 flash/1.2.11;
 module list #Prints list of modules and versions
 
-## Print inputs
-echo -e "Input fastqs:\n$(ls *.fastq.gz | xargs -n1)" ;
-echo
 
-#Concatenate _R1 and _R2 fastq files into a single R1 and a single R2 file.
-# nohup cat *_R1* > R1.fastq.gz
-# nohup cat *_R2* > R2.fastq.gz
-
-# if [ -s R1.fastq.gz ]
-# 	then
-# 	echo "Read 1 reads successfully concatenated at `date +"%T"`."
-#         echo
-# 	else
-# 	echo "R1 concatenation unsuccessfull."  
-# 	exit
-# fi
-
-# if [ -s R2.fastq.gz ]
-#         then
-#         echo "Read 2 reads successfully concatenated at `date +"%T"`."
-#         echo
-#         else
-#         echo "R2 concatenation unsuccessfull."  
-#         exit
-# fi
 
 #Use bowtie2 to align the fastq files to the designated genome (set as $genome).
 #Currently, allow reads which multi-map to max 2 regions to continue into downstream analysis. Change -k to alter this.
@@ -109,6 +93,8 @@ echo
 
 # Read SRA_ids from a a config file. One per line.
 mapfile -t sra_ids < sra_ids.cfg
+echo "SRA ids: "${sra_ids[@]}
+
 for sra_id in ${sra_ids[@]}; do
     
     echo "${NOW} Calling bowtie for ${sra_id}"

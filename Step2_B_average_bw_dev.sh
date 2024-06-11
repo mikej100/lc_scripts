@@ -4,44 +4,11 @@
 #SBATCH --mem=50G
 #SBATCH --time=00-10:00:00
 #SBATCH --output=%j_%x.out
-#SBATCH --error=%j_%x.err
-#SBATCH --mail-type=end,fail
+#SBATCH --error=%j_%x.out
+#SBATCH --mail-type=fail
 
 module load python-cbrg/202401
-module load lanceotron/20230726
 #
-# Generate 
-## This is an example of how to generate bigwigs and peak call fromt hese peaks using lanceotron
-# This version by Mike Jennings based on script from Lucy Cornell
-# Changed to run from within the model folder
-# 
-## This is also written for samples which are held in individual folders, that have files of the same name
-## ie 
-# ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam.bai
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R1.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R2.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.smooth.rpkm.bw
-#
-## This should also be run from within the sample directory ie 
-# ├ Experiment folder					<------ From here
-# ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam.bai
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R1.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R2.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.smooth.rpkm.bw
-#
-# Change the genome reference in the bedToBigBed to match your sample
-#
-### Run as the following replacing <Model> with your sample name (without .bam)
-
-# sbatch Bigwigs_for_lanceotron.sh <Model> 
-#Create a date and timestamp for when analysis began
-Start_time=`date`
-Time=`date +"%T"`
-workingdir="$(pwd)"
 # echo "Show git commit reference:"
 # git -C ./lc_scripts/ show -s --format=%h%x09%ci%x09%an%x09%s
 

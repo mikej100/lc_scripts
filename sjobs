@@ -1,0 +1,1 @@
+sacct --user $USER -X --format="JobId,JobName%40,State,Start,Elapsed,ExitCode"

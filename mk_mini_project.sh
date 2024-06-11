@@ -19,7 +19,7 @@ mapfile -t model < models.cfg
 
 
 for i in ${!model[@]}; do
-    mkdir -p ${model[$i]}
+    mkdir -p ${model[$i]}/slurm
 done
 
 for i in ${!model[@]}; do
