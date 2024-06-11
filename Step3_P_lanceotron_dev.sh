@@ -62,16 +62,16 @@ bamCoverage --bam "$bam" -o "$model".bw --extendReads -bs 1 --normalizeUsing RPK
 echo "Starting Lanceotron for $bam" ;
 
 # Runs Lanceotron
-lanceotron callPeaks "$model".bw -f Lanceotron_outputs ;
+lanceotron callPeaks "$model".bw -f Lanceotron_output ;
 
 # This filters peak calls to only those of a score greater than 0.8
 echo "Taking top scoring peaks" ;
 
-awk 'BEGIN{FS=OFS="\t"} { if(($4>=0.8) && ($4<=1)) { print $1,$2,$3,$4,$5,$6,$7,$8 } }' Lanceotron_outputs/"$model"_L-tron.bed > Peak_analysis/Lanceotron_outputs/"$model"_L-tron_toppeaks.bed ;
+awk 'BEGIN{FS=OFS="\t"} { if(($4>=0.8) && ($4<=1)) { print $1,$2,$3,$4,$5,$6,$7,$8 } }' Lanceotron_output/"$model"_L-tron.bed > Peak_analysis/Lanceotron_output/"$model"_L-tron_toppeaks.bed ;
 
 ### Generating a bigbed for UCSC
 module load ucsctools/385
 
-bedToBigBed Lanceotron_outputs/"$model"_L-tron_toppeaks.bed \
+bedToBigBed Lanceotron_output/"$model"_L-tron_toppeaks.bed \
  	$chr_sizes_file \
-	Lanceotron_outputs/"$model"_L-tron_toppeaks_bigGenePred.bb ;
+	Lanceotron_output/"$model"_L-tron_toppeaks_bigGenePred.bb ;

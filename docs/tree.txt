@@ -1,0 +1,76 @@
+.
+├── ana_1
+├── ATAC
+│   ├── ATAC.bam
+│   ├── ATAC.bam.bai
+│   ├── ATAC.bw
+│   ├── ATAC.rpkm.bw
+│   ├── Lanceotron_output
+│   │   ├── ATAC_L-tron.bed
+│   │   ├── ATAC_L-tron_toppeaks.bed
+│   │   ├── ATA_L-tron_toppeaks.bed
+│   │   └── _L-tron_toppeaks.bed
+│   ├── slurm
+│   ├── SRR15970891_ter119_APH_spleen_rep1_R1.fastq.gz
+:│   └── SRR15970891_ter119_APH_spleen_rep1_R2.fastq.gz
+├── enhancer_mcs_mm10_conservation.npz
+├── H3K4me1
+│   ├── slurm
+│   ├── sra_ids.cfg
+│   ├── SRR14573546.bai
+│   ├── SRR14573546.bam
+│   ├── SRR14573546.bw
+│   ├── SRR14573546_R1.fastq.gz
+│   ├── SRR14573546_R2.fastq.gz
+│   ├── SRR14573547.bai
+│   ├── SRR14573547.bam
+│   ├── SRR14573547.bw
+│   ├── SRR14573547_R1.fastq.gz
+│   ├── SRR14573547_R2.fastq.gz
+│   ├── SRR14573548.bai
+│   ├── SRR14573548.bam
+│   ├── SRR14573548.bw
+│   ├── SRR14573548_R1.fastq.gz
+│   └── SRR14573548_R2.fastq.gz
+├── H3K4me3
+│   ├── slurm
+│   ├── sra_ids.cfg
+│   ├── SRR5453541.bai
+│   ├── SRR5453541.bam
+│   ├── SRR5453541.bw
+│   ├── SRR5453541_R1.fastq.gz
+│   ├── SRR5453541_R2.fastq.gz
+│   ├── SRR5453542.bai
+│   ├── SRR5453542.bam
+│   ├── SRR5453542_R1.fastq.gz
+│   └── SRR5453542_R2.fastq.gz
+├── Med1
+│   ├── Med1.bam
+│   ├── Med1.bam.bai
+│   ├── Med1.bw
+│   ├── R1.fastq.gz
+│   ├── R2.fastq.gz
+│   ├── slurm
+│   ├── sra_ids.cfg
+│   ├── SRR3199708.bai
+│   ├── SRR3199708.bam
+│   ├── SRR3199708.bw
+│   ├── SRR3199708_R1.fastq.gz
+│   └── SRR3199708_R2.fastq.gz
+├── mini-proj
+│   ├── ATAC
+│   │   ├── ATAC.bam
+│   │   └── slurm
+│   ├── H3K4me1
+│   │   ├── H3K4me1.bam
+│   │   └── slurm
+│   ├── H3K4me3
+│   │   ├── H3K4me3.bam
+│   │   └── slurm
+│   ├── Med1
+│   │   ├── Med1.bam
+│   │   └── slurm
+│   └── models.cfg
+├── models.cfg
+
+20 directories, 55 files

@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Move slurm output to slurm subdirectory
+mkdir -p slurm
+
+for file in *.out; do
+	mv "$file" "slurm/${file}"
+done
+
+for file in *.err; do
+	mv "$file" "slurm/${file}"
+done
+
+for file in sps-*; do
+	mv "$file" "slurm/${file}"
+done
