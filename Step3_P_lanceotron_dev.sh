@@ -42,11 +42,16 @@ module load lanceotron
 
 # sbatch Bigwigs_for_lanceotron.sh <Model> 
 #Create a date and timestamp for when analysis began
-workingdir="$(pwd)"
 
+now() {
+    date +"%Y-%m-%dT%T"
+}
 NOW=`date +"%Y-%m-%dT%T"`
 
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
+echo $(now) Starting $(basename "${BASH_SOURCE}")
+
+workingdir="$(pwd)"
+
 # Show git info for scripts folder
 ${SCRIPTS}/scripts_info.sh || true
 #Model name is the folder name
@@ -60,7 +65,7 @@ model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
 #bamCoverage --bam "$bam" -o "$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
 
 input_file="${model}.bw"
-echo "${NOW} Starting Lanceotron for ${input_file}" ;
+echo "$(now) Starting Lanceotron for ${input_file}" ;
 
 # Runs Lanceotron
 lanceotron callPeaks $input_file -f Lanceotron_output

@@ -12,11 +12,12 @@
 
 # subset of step 1, to process mini-bam file so bw for the mini project
 source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
+now() {
+    date +"%Y-%m-%dT%T"
+}
 
-NOW=`date +"%Y-%m-%dT%T"`
+echo $(now) Starting $(basename "${BASH_SOURCE}")
 
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
-echo  " "
 ${SCRIPTS}/scripts_info.sh || true
 
 # Read SRA_ids from a a config file. One per line.
@@ -25,10 +26,10 @@ echo "SRA ids: "${sra_ids[@]}
 
 for sra_id in ${sra_ids[@]}; do
         #Index the bam file
-    echo "${NOW} Calling samtools::index for ${sra_id}"
+    echo "$(now) Calling samtools::index for ${sra_id}"
         samtools index ${sra_id}.bam  
 
-   #  echo "${NOW} Calling bamCoverage for ${sra_id}"
+   #  echo "$(now) Calling bamCoverage for ${sra_id}"
    #  
    #  bamCoverage --bam "${sra_id}.bam" \
    #          -o "${sra_id}.bw" \

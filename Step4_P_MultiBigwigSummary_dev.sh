@@ -12,14 +12,15 @@ echo "Test environment variable value: ${TEST_VAR}"
 module load python-cbrg/current
 source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
 
-Start_time=`date`
-Time=`date +"%T"`
-workingdir="$(pwd)"
 
-
+now() {
+    date +"%Y-%m-%dT%T"
+}
 NOW=`date +"%Y-%m-%dT%T"`
 
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
+echo $(now) Starting $(basename "${BASH_SOURCE}")
+workingdir="$(pwd)"
+
 # Show git info for scripts folder
 echo "SCRIPT environment variable set as : $SCRIPTS"
 ${SCRIPTS}/scripts_info.sh || true
@@ -44,7 +45,7 @@ bed_filename="../${model[0]}/Lanceotron_output/${model[0]}_L-tron_toppeaks.bed"
 echo "bed filename ${bed_filename}"
 
 
-echo "${now} Starting multiBigwigSummary"
+echo "$(now) Starting multiBigwigSummary"
  
  multiBigwigSummary BED-file \
      -b $bw_filenames \

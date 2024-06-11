@@ -18,7 +18,13 @@
 # TODO download file description info so user can confirm is what expected
 # Mike Jennings, based on script by Lucy Cornell
 #
-echo "starting SRA download script"
+
+
+now() {
+    date +"%Y-%m-%dT%T"
+}
+
+echo $(now) Starting $(basename "${BASH_SOURCE}")
 
 # Read SRA_ids from a a config file. One per line.
 mapfile -t sra_ids < sra_ids.cfg

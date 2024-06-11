@@ -25,9 +25,13 @@ Start_time=`date`
 Time=`date +"%T"`
 workingdir="$(pwd)"
 
+
+now() {
+    date +"%Y-%m-%dT%T"
+}
 NOW=`date +"%Y-%m-%dT%T"`
 
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
+echo $(now) Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
 ${SCRIPTS}/scripts_info.sh || true
 # echo
@@ -93,36 +97,36 @@ echo "SRA ids: "${sra_ids[@]}
 
 for sra_id in ${sra_ids[@]}; do
     
-    echo "${NOW} Calling bowtie for ${sra_id}"
+    echo "$(now) Calling bowtie for ${sra_id}"
     bowtie2 -k 2 -N 1 -p 4 \ -1 ${sra_id}_R1.fastq.gz \ -2 ${sra_id}_R2.fastq.gz \
         --maxins 1000 \
         -x /databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome \
         -S ${sra_id}_alignment.sam
 
         #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
-    echo "${NOW} Calling samtools::view for ${sra_id}"
+    echo "$(now) Calling samtools::view for ${sra_id}"
         samtools view -@8 -bS -F4 -o ${sra_id}_mapped.bam ${sra_id}_alignment.sam ;
 
         #Sort the reads in mapped.bam by coordinate.
-    echo "${NOW} Calling samtools::sort for ${sra_id}"
+    echo "$(now) Calling samtools::sort for ${sra_id}"
         samtools sort ${sra_id}_mapped.bam -@8 -o ${sra_id}_mapped.srtC ;
         rm -rf ${sra_id}_mapped.bam
 
         #Remove PCR duplicates.
-    echo "${NOW} Calling samtools::rmdup for ${sra_id}"
+    echo "$(now) Calling samtools::rmdup for ${sra_id}"
         samtools rmdup ${sra_id}_mapped.srtC ${sra_id}_filtered.bam ; 
         rm -rf ${sra_id}_mapped.srtC *.txt *.histogram *.hist
 
         #Index the bam file
-    echo "${NOW} Calling samtools::index for ${sra_id}"
+    echo "$(now) Calling samtools::index for ${sra_id}"
         samtools index ${sra_id}_filtered.bam  
 
-    echo "${NOW} renaming bam files for ${sra_id}"
+    echo "$(now) renaming bam files for ${sra_id}"
         mv ${sra_id}_filtered.bam       ${sra_id}.bam
         mv ${sra_id}_filtered.bam.bai   ${sra_id}.bai
         mv ${sra_id}_filtered.rpkm.bw   ${sra_id}.rpkm.bw
 
-    echo "${NOW} Calling bamCoverage for ${sra_id}"
+    echo "$(now) Calling bamCoverage for ${sra_id}"
     
     bamCoverage --bam "${sra_id}.bam" \
             -o "${sra_id}.bw" \
@@ -169,8 +173,8 @@ rm -rf  *_filtered.bg \
         *_alignment.sam ;
 rm *fq*
 
-echo -e "${NOW} Intermediate files removed at `date +"%T"`\n" ;
+echo -e "$(now) Intermediate files removed at `date +"%T"`\n" ;
 echo
-echo -e "${NOW} ChIP pipeline finished `date +"%T"`"
+echo -e "$(now) ChIP pipeline finished `date +"%T"`"
 echo
 exit ;

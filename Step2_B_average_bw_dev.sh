@@ -20,11 +20,11 @@ now() {
     date +"%Y-%m-%dT%T"
 }
 
-echo ${now} Starting $(basename "${BASH_SOURCE}")
+echo $(now) Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
 #${SCRIPTS}/scripts_info.sh || true
 
-echo "${now} DEBUG returned to main script"
+echo "$(now) DEBUG returned to main script"
 
 
 #Model name is the folder name
@@ -52,17 +52,17 @@ fnames=$(printf %s.bw" " "${sra_ids[@]}")
 # 
 echo "Input bigwigs : $fnames"
 # 
-echo "${now} Starting Wiggletools mean"
+echo "$(now) Starting Wiggletools mean"
 wiggletools mean ${fnames} > "$output_file".temp.wig 
 # 	wiggletools mean "$file_1" "$file_2" > "$output_file".temp.wig
 # else
 # 	wiggletools mean "$file_1" "$file_2" "$file_3" > "$output_file".temp.wig
 # fi ;
 # 
-echo "${now} Starting wigToBigWig"
+echo "$(now) Starting wigToBigWig"
 wigToBigWig "$output_file".temp.wig $chr_sizes "$output_file" ]
 # 
 # rm "$output_file".temp.wig
 # 
- echo "${now}Finished"
+ echo "$(now)Finished"
  echo 
