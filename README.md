@@ -3,6 +3,11 @@ Written by Mike Jennings, based on scripts from \<to be named>.
 
 Set up
 ======
+Script file location
+--------------------
+Clone the repository to a location accessible on your server. You may need to set the permission on the scripts to ensure they are executable.
+
+Users at the home institution and in the Higgs group can use directly from the author's folders. Ask for the location.
 
 ~/.bashrc
 ----------
@@ -16,7 +21,8 @@ current work directory.
 
 Project directory
 -----------------
-Subdirectory for each track of data (model)
+Create a directory to hold all the data and results for a set of analysis.
+reate a subdirectory in the project with a name for each type of result set, for example ATAC_EB results. This is termed the model.
 The name of the subdirectory will be used for track name of aggregated data 
 such as peak call
 
@@ -36,7 +42,7 @@ Prior to developing this feature, the sra_id is used
 
 Analysis subdirectory
 ---------------------
-Create subdirectory in the project with a name for the analysis to perform
+Create a subdirectory one level down from the project directory for a set of analysis results.
 
 Add a `models.cfg` with the names of the models to include in the analysis. 
 This can be a subset of the models in the project.
@@ -169,3 +175,10 @@ Other utitilities
   select .bam data for the mouse alpha globin TAD.
 
 `zip-fastq.sh` - gz zip any .fastq files in current directory.
+
+Futher work
+===========
+
+Use a repository directory to hold fastq.gz files so they are held once only. Enable use of symlinks or another solution.
+
+Implement sample naming in the models. Currently is this done by sra_id, but not all samples have an SRA.
