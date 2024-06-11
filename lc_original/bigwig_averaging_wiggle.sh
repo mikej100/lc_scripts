@@ -9,18 +9,6 @@
 
 source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
 
-
-NOW=`date +"%Y-%m-%dT%T"`
-
-echo ${NOW} Starting $(basename "${BASH_SOURCE}")
-# Show git info for scripts folder
-echo "git info using \$SCRIPTS"
-${SCRIPTS}/scripts_info.sh || true
-
-
-#Model name is the folder name
-model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
-
 ## This is how to run: 
 #sbatch bigwig_averaging_wiggle.sh <output file name _averaged> <Input 1.bw> <Input 2.bw> (optional) <Input 3.bw>
 # Make sure the genome build is correct
@@ -28,18 +16,7 @@ model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
 # sbatch bigwig_averaging_wiggle.sh GSM923582_mm9_Tal1_ter119_averaged.bw GSM923582_mm9_wgEncodePsuTfbsErythroblTal1BE14halfCd1InputRepSignalRep1.bigWig GSM923582_mm9_wgEncodePsuTfbsErythroblTal1BE14halfCd1InputRepSignalRep2.bigWig GSM923582_mm9_wgEncodePsuTfbsErythroblTal1BE14halfCd1InputRepSignalRep3.bigWig
 # sbatch bigwig_averaging_wiggle.sh APHSpleen_Ter119_ATAC_averaged.bs1.rpkm.bw APHSpleen_Ter119_ATAC_rep1.bs1.rpkm.bw APHSpleen_Ter119_ATAC_rep2.bs1.rpkm.bw
 
-
-# Read SRA_ids from a a config file. One per line.
-mapfile -t sra_ids < sra_ids.cfg
-echo "SRA ids: "${sra_ids[@]}
-output_file="$model"
-
-
-for sra_id in ${sra_ids[@]}; do
-    
-done
-
-exit
+output_file="$1"
 file_1="$2"
 file_2="$3"
 file_3="$4"

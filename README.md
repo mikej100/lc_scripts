@@ -113,6 +113,22 @@ Here is an example project structure part-way through running the scripts.
         │   └── models.cfg
         ├── models.cfg
 
+Run the scripts
+===============
+
+To run the upstream pipeline scripts (which contain Q, B, P in their name) `cd` to the subdirectory
+ of the model. Then type the script. For example
+
+        sbatch $SCRIPTS/Step1_B_fastq2bw.sh
+If you have added $SCRIPTS to your $PATH, then just
+
+        sbatch Step1_B_fastqbw.sh
+
+Slurm logs will be written to the subfolder `/slurm` and the output file created in the current directory or subdirectories. You can use the utilities `sjobs` to view the jobs, `stree` to view data in the directory tree and `stidy-up` to tidy away slurm log files to the slurm subdirectory if you have from running other scripts.
+
+The slurm log contains information about the precise version of the script which is run. This information can be used to inpsect and  a copy of that version of the script. Note that this relies on having committed any changes to git.
+
+
 Utilities
 =========
 Slurm utilities

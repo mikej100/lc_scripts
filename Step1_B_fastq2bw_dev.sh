@@ -33,7 +33,6 @@ echo ${NOW} Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
 echo "git info using \$SCRIPTS"
 ${SCRIPTS}/scripts_info.sh || true
-exit
 # echo
 # echo "Script file information from git"
 # echo "================================"
