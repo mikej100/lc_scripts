@@ -27,40 +27,23 @@ module load lanceotron
 # │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R2.fastq.gz
 # │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.smooth.rpkm.bw
 #
-## This should also be run from within the sample directory ie 
-# ├ Experiment folder					<------ From here
-# ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.bam.bai
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R1.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2_R2.fastq.gz
-# │   ├── CD71_EB_Rad21_Mira_INVEN_E14_Rep2.smooth.rpkm.bw
-#
 # Change the genome reference in the bedToBigBed to match your sample
 #
 ### Run as the following replacing <Model> with your sample name (without .bam)
 
 # sbatch Bigwigs_for_lanceotron.sh <Model> 
-#Create a date and timestamp for when analysis began
 
 now() {
     date +"%Y-%m-%dT%T"
 }
-NOW=`date +"%Y-%m-%dT%T"`
-
 echo $(now) Starting $(basename "${BASH_SOURCE}")
-
-workingdir="$(pwd)"
 
 # Show git info for scripts folder
 ${SCRIPTS}/scripts_info.sh || true
 #Model name is the folder name
+workingdir="$(pwd)"
 model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
 
-# Find the bam with the corresponding name within its folder
-# 
-#echo "Starting Bigwig for $bam" ;
-#
 ## Generates a Bigwig of bin size 1 and RPKM normalised, the preferred input for Lanceotron
 #bamCoverage --bam "$bam" -o "$model".bw --extendReads -bs 1 --normalizeUsing RPKM ;
 

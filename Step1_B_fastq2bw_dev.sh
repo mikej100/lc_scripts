@@ -29,7 +29,7 @@ workingdir="$(pwd)"
 now() {
     date +"%Y-%m-%dT%T"
 }
-NOW=`date +"%Y-%m-%dT%T"`
+
 
 echo $(now) Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
