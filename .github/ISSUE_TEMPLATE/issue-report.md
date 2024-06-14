@@ -18,16 +18,16 @@ Commands entered
 
 **Expected behavior**
 Expected output and messages.
-Has this worked OK before
+Has this worked OK before.
 
 **Logs and screenshots**
 Messages displayed to the terminal
-Out or .err report from slurm or other batch manager
+Log file (.out or .err report) from slurm or other batch manager
 
 
 **Operating envirohment**
 - Running on CCB or other managed platform vs on your own machine
-- Any modules loaded
+- Modules loaded
 
 **Importance to resolve**
 Is this holding up some work important to you? Do you have a workaround?
