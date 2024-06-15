@@ -1,9 +1,10 @@
 #!/bin/bash
 #SBATCH --partition=long
-#SBATCH --job-name=SRA-download-from-list
+#SBATCH --output=slurm/%j_%x.out 
+#SBATCH --error=slurm/%j_%x.out
 #SBATCH --ntasks=4
 #SBATCH --mem=12G
-#SBATCH --time=00-05:00:00
+#SBATCH --time=00-10:00:00
 
 # Download SRA files specified by list in current folder
 # ======================================================
@@ -41,6 +42,14 @@ Time=`date +"%T"`
 
 module load sratoolkit
 # vdb-config --interactive
+
+now() {
+    date +"%Y-%m-%dT%T"
+}
+
+echo $(now) Starting $(basename "${BASH_SOURCE}")
+# Show git info for scripts folder
+${SCRIPTS}/scripts_info.sh || true
 
 #TODO Understand requirement for creating meaningful filename
 echo "SRA ids: "${sra_ids[@]}
