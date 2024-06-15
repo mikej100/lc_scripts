@@ -103,13 +103,12 @@ module list #Prints list of modules and versions
 mapfile -t sra_ids < sra_ids.cfg
 echo "SRA ids: "${sra_ids[@]}
 
-outfile='H3K4me1_spleen_ter119_Kowalczyk'
 echo "ref_genome: ${ref_genome}"
 for sra_id in ${sra_ids[@]}; do
     if [[ "${endedness}" == "single" ]]; then
         echo "$(now) Calling bowtie for ${sra_id} as single-ended data"
-#        bowtie2 -k 2 -N 1 -p 4 -U  --sra-acc $sra_id \
-        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
+        bowtie2 -k 2 -N 1 -p 4 -U  --sra-acc $sra_id \
+#        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
             --maxins 1000 \
             -x $ref_genome \
             -S ${outfile}_alignment.sam
