@@ -61,5 +61,5 @@ done
 
 for file in *.fastq ; do
     echo "G-zipping $file" ;
-    gzip $file ;
+    gzip $file --force ;
 done
