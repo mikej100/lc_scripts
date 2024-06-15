@@ -20,6 +20,15 @@
 ###########################################################################################################################################################
 #move to working directory
 
+####### Set Opions 
+###############################################################################
+#endedness="paired"
+endedness="single" 
+
+genome="${1:-mm39}"
+echo $genome
+
+
 #Create a date and timestamp for when analysis began
 Start_time=`date`
 Time=`date +"%T"`
@@ -48,8 +57,6 @@ ${SCRIPTS}/scripts_info.sh || true
 
 #git -C "${SCRIPT_DIR}ASH_SOURCE})" rev-parse --abbrev-ref HEAD  
 #Genome path, default to mm39
-genome="${1:-mm39}"
-echo $genome
 
 #Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
 if [ "$genome" == "mm9" ] || [ "$genome" == "mm10" ] || [ "$genome" == "mm39" ]; then 
@@ -60,6 +67,7 @@ else
 	echo "Please check your genome build and/or species."  
 	exit
 fi ;
+ref_genome="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome"
 
 #Model name is the folder name
 model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
@@ -95,15 +103,26 @@ module list #Prints list of modules and versions
 mapfile -t sra_ids < sra_ids.cfg
 echo "SRA ids: "${sra_ids[@]}
 
+outfile='H3K4me1_spleen_ter119_Kowalczyk'
+echo "ref_genome: ${ref_genome}"
 for sra_id in ${sra_ids[@]}; do
-    
-    echo "$(now) Calling bowtie for ${sra_id}"
-    bowtie2 -k 2 -N 1 -p 4 \ -1 ${sra_id}_R1.fastq.gz \ -2 ${sra_id}_R2.fastq.gz \
-        --maxins 1000 \
-        -x /databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome \
-        -S ${sra_id}_alignment.sam
-
+    if [[ "${endedness}" == "single" ]]; then
+        echo "$(now) Calling bowtie for ${sra_id} as single-ended data"
+#        bowtie2 -k 2 -N 1 -p 4 -U  --sra-acc $sra_id \
+        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
+            --maxins 1000 \
+            -x $ref_genome \
+            -S ${outfile}_alignment.sam
+    else
+        echo "$(now) Calling bowtie for ${sra_id} as pair-ended data"
+#        bowtie2 -k 2 -N 1 -p 4  --sra-acc ${sra_id}
+        bowtie2 -k 2 -N 1 -p 4  c ${sra_id}
+            --maxins 1000 \
+            -x $ref_genome \
+            -S ${sra_id}_alignment.sam
+    fi
         #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
+
     echo "$(now) Calling samtools::view for ${sra_id}"
         samtools view -@8 -bS -F4 -o ${sra_id}_mapped.bam ${sra_id}_alignment.sam ;
 
