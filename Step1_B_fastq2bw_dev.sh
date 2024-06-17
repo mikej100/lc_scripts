@@ -22,8 +22,8 @@
 
 ####### Set Opions 
 ###############################################################################
-#endedness="paired"
-endedness="single" 
+endedness="paired"
+#endedness="single" 
 
 genome="${1:-mm39}"
 echo $genome
@@ -104,14 +104,15 @@ mapfile -t sra_ids < sra_ids.cfg
 echo "SRA ids: "${sra_ids[@]}
 
 echo "ref_genome: ${ref_genome}"
+#        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
+#        bowtie2 -k 2 -N 1 -p 4  --sra-acc SRR5453542 \
 for sra_id in ${sra_ids[@]}; do
     if [[ "${endedness}" == "single" ]]; then
         echo "$(now) Calling bowtie for ${sra_id} as single-ended data"
-        bowtie2 -k 2 -N 1 -p 4 -U  --sra-acc $sra_id \
-#        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
+        bowtie2 -k 2 -N 1 -p 4   -1 ${sra_id}_R1.fastq.gz -2 ${sra_id}_R2.fastq.gz \
             --maxins 1000 \
             -x $ref_genome \
-            -S ${outfile}_alignment.sam
+            -S ${sra_id}_alignment.sam
     else
         echo "$(now) Calling bowtie for ${sra_id} as pair-ended data"
 #        bowtie2 -k 2 -N 1 -p 4  --sra-acc ${sra_id}
