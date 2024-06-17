@@ -23,40 +23,22 @@
 ####### Set Opions 
 ###############################################################################
 #endedness="paired"
+
+#=== Boiler plate for job logging ==============================================
+now() {
+    date +"%Y-%m-%dT%T"
+}
+echo $(now) Starting $(basename "${BASH_SOURCE}")
+# Show git info for scripts folder
+${SCRIPTS}/scripts_info.sh || true
+#===============================================================================
+
 endedness="single" 
 
 genome="${1:-mm39}"
 echo $genome
 
-
-#Create a date and timestamp for when analysis began
-Start_time=`date`
-Time=`date +"%T"`
 workingdir="$(pwd)"
-
-
-now() {
-    date +"%Y-%m-%dT%T"
-}
-
-
-echo $(now) Starting $(basename "${BASH_SOURCE}")
-# Show git info for scripts folder
-${SCRIPTS}/scripts_info.sh || true
-# echo
-# echo "Script file information from git"
-# echo "================================"
-# 
-# echo "Here are repository; branch; most recent commit reference, date, author and comment"
-# 
-# SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-# git -C "$SCRIPT_DIR" remote -v | grep fetch
-# # git -C $(dirname ${BASH_SOURCE}) rev-parse --abbrev-ref HEAD
-# # git -C $(dirname ${BASH_SOURCE}) show -s --format=%h%x09%ci%x09%an%x09%sk
-
-
-#git -C "${SCRIPT_DIR}ASH_SOURCE})" rev-parse --abbrev-ref HEAD  
-#Genome path, default to mm39
 
 #Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
 if [ "$genome" == "mm9" ] || [ "$genome" == "mm10" ] || [ "$genome" == "mm39" ]; then 
@@ -99,17 +81,19 @@ module list #Prints list of modules and versions
 #Currently, maximum fragment length allowed is 1000bp. Change --maxins if you want to alter this e.g. perhaps change to 150bp if you want
 #only mononucleosomes.
 
-# Read repls from a a config file. One per line.
+# Read configuration data
 mapfile -t sra_ids < sra_ids.cfg
-echo "SRA ids: "${sra_ids[@]}
 mapfile -t repl < replicate_names.cfg
+echo "SRA ids: "${sra_ids[@]}
 echo "Replicate names: "${repl[@]}
-
 echo "ref_genome: ${ref_genome}"
+
 #        bowtie2 -k 2 -N 1 -p 4 -U  $repl \
 #        bowtie2 -k 2 -N 1 -p 4  --sra-acc SRR5453542 \
 #        bowtie2 -k 2 -N 1 -p 4   -1 ${repl}_R1.fastq.gz -2 ${repl}_R2.fastq.gz \
+
 for r in ${repl[@]}; do
+if false; then
     if [[ "${endedness}" == "single" ]]; then
         echo "$(now) Calling bowtie for ${repl} as single-ended data"
         echo "$(now) Calling bowtie for source file  ${sra_ids[0]}"
@@ -147,10 +131,9 @@ for r in ${repl[@]}; do
     echo "$(now) renaming bam files for ${repl}"
         mv ${repl}_filtered.bam       ${repl}.bam
         mv ${repl}_filtered.bam.bai   ${repl}.bai
-        mv ${repl}_filtered.rpkm.bw   ${repl}.rpkm.bw
 
+fi
     echo "$(now) Calling bamCoverage for ${repl}"
-    
     bamCoverage --bam "${repl}.bam" \
             -o "${repl}.bw" \
             --extendReads \
@@ -159,11 +142,6 @@ for r in ${repl[@]}; do
 done
 
 module unload python-base
-
-echo
-echo "----------------- Bamcoverage for Bigwigs -----------------" ;
-echo
-
 module load python-cbrg
 
 #Create the bigwig (CPM (can swap CPM for RPKM here if you want. Other normalisation options available too) and smoothed over 100bp in
@@ -175,19 +153,6 @@ blacklist=$(echo $(ls /project/higgslab/shared/00_analysis_file_bank/Blacklists/
 
 # If you would like blacklist regions removed, add this to the bamcoverage command:
 # --blackListFileName "$blacklist"
-# Mike Jennings comment out this block becuase the .bw files are generated in "Step1" script"
-# bamCoverage -b filtered.bam --normalizeUsing RPKM --smoothLength 100 -p 4 -bs 50 -o filtered.rpkm.bw ;
-# 
-# if [ -s filtered.rpkm.bw ]
-#         then
-#         echo "RPKM normalized bigwig successfully generated at `date +"%T"`." 
-#         echo "See results in filtered.rpkm.bw."
-#         echo
-#         else
-#         echo "bigwig generation unsuccessful."  
-#         exit
-# fi
-# 
 # # Change names
 #Get rid of intermediate files to save space. But KEEP filtered.bam for Macs2 analysis (need bam for peak calling and downstream analysis).
 rm -rf  *_filtered.bg \
