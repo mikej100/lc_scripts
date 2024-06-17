@@ -22,8 +22,8 @@
 
 ####### Set Opions 
 ###############################################################################
-endedness="paired"
-#endedness="single" 
+#endedness="paired"
+endedness="single" 
 
 genome="${1:-mm39}"
 echo $genome
@@ -99,57 +99,60 @@ module list #Prints list of modules and versions
 #Currently, maximum fragment length allowed is 1000bp. Change --maxins if you want to alter this e.g. perhaps change to 150bp if you want
 #only mononucleosomes.
 
-# Read SRA_ids from a a config file. One per line.
+# Read repls from a a config file. One per line.
 mapfile -t sra_ids < sra_ids.cfg
 echo "SRA ids: "${sra_ids[@]}
+mapfile -t repl < replicate_names.cfg
+echo "Replicate names: "${repl[@]}
 
 echo "ref_genome: ${ref_genome}"
-#        bowtie2 -k 2 -N 1 -p 4 -U  $sra_id \
+#        bowtie2 -k 2 -N 1 -p 4 -U  $repl \
 #        bowtie2 -k 2 -N 1 -p 4  --sra-acc SRR5453542 \
-#        bowtie2 -k 2 -N 1 -p 4   -1 ${sra_id}_R1.fastq.gz -2 ${sra_id}_R2.fastq.gz \
-for sra_id in ${sra_ids[@]}; do
+#        bowtie2 -k 2 -N 1 -p 4   -1 ${repl}_R1.fastq.gz -2 ${repl}_R2.fastq.gz \
+for r in ${repl[@]}; do
     if [[ "${endedness}" == "single" ]]; then
-        echo "$(now) Calling bowtie for ${sra_id} as single-ended data"
-        bowtie2 -k 2 -N 1 -p 4   -1 ${sra_id}_R1.fastq.gz -2 ${sra_id}_R2.fastq.gz \
+        echo "$(now) Calling bowtie for ${repl} as single-ended data"
+        echo "$(now) Calling bowtie for source file  ${sra_ids[0]}"
+        bowtie2 -k 2 -N 1 -p 4 -U  ${sra_ids[0]} \
             --maxins 1000 \
             -x $ref_genome \
-            -S ${sra_id}_alignment.sam
+            -S ${r}_alignment.sam
     else
-        echo "$(now) Calling bowtie for ${sra_id} as pair-ended data"
-#        bowtie2 -k 2 -N 1 -p 4  --sra-acc ${sra_id}
-        bowtie2 -k 2 -N 1 -p 4   -1 ${sra_id}_R1.fastq.gz -2 ${sra_id}_R2.fastq.gz \
+        echo "$(now) Calling bowtie for ${repl} as pair-ended data"
+#        bowtie2 -k 2 -N 1 -p 4  --sra-acc ${repl}
+        bowtie2 -k 2 -N 1 -p 4   -1 ${repl}_R1.fastq.gz -2 ${repl}_R2.fastq.gz \
             --maxins 1000 \
             -x $ref_genome \
-            -S ${sra_id}_alignment.sam
+            -S ${repl}_alignment.sam
     fi
         #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
 
-    echo "$(now) Calling samtools::view for ${sra_id}"
-        samtools view -@8 -bS -F4 -o ${sra_id}_mapped.bam ${sra_id}_alignment.sam ;
+    echo "$(now) Calling samtools::view for ${repl}"
+        samtools view -@8 -bS -F4 -o ${repl}_mapped.bam ${repl}_alignment.sam ;
 
         #Sort the reads in mapped.bam by coordinate.
-    echo "$(now) Calling samtools::sort for ${sra_id}"
-        samtools sort ${sra_id}_mapped.bam -@8 -o ${sra_id}_mapped.srtC ;
-        rm -rf ${sra_id}_mapped.bam
+    echo "$(now) Calling samtools::sort for ${repl}"
+        samtools sort ${repl}_mapped.bam -@8 -o ${repl}_mapped.srtC ;
+        rm -rf ${repl}_mapped.bam
 
         #Remove PCR duplicates.
-    echo "$(now) Calling samtools::rmdup for ${sra_id}"
-        samtools rmdup ${sra_id}_mapped.srtC ${sra_id}_filtered.bam ; 
-        rm -rf ${sra_id}_mapped.srtC *.txt *.histogram *.hist
+    echo "$(now) Calling samtools::rmdup for ${repl}"
+        samtools rmdup ${repl}_mapped.srtC ${repl}_filtered.bam ; 
+        rm -rf ${repl}_mapped.srtC *.txt *.histogram *.hist
 
         #Index the bam file
-    echo "$(now) Calling samtools::index for ${sra_id}"
-        samtools index ${sra_id}_filtered.bam  
+    echo "$(now) Calling samtools::index for ${repl}"
+        samtools index ${repl}_filtered.bam  
 
-    echo "$(now) renaming bam files for ${sra_id}"
-        mv ${sra_id}_filtered.bam       ${sra_id}.bam
-        mv ${sra_id}_filtered.bam.bai   ${sra_id}.bai
-        mv ${sra_id}_filtered.rpkm.bw   ${sra_id}.rpkm.bw
+    echo "$(now) renaming bam files for ${repl}"
+        mv ${repl}_filtered.bam       ${repl}.bam
+        mv ${repl}_filtered.bam.bai   ${repl}.bai
+        mv ${repl}_filtered.rpkm.bw   ${repl}.rpkm.bw
 
-    echo "$(now) Calling bamCoverage for ${sra_id}"
+    echo "$(now) Calling bamCoverage for ${repl}"
     
-    bamCoverage --bam "${sra_id}.bam" \
-            -o "${sra_id}.bw" \
+    bamCoverage --bam "${repl}.bam" \
+            -o "${repl}.bw" \
             --extendReads \
             -bs 1 \
             --normalizeUsing RPKM
