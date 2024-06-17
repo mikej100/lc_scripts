@@ -22,7 +22,6 @@
 
 ####### Set Opions 
 ###############################################################################
-#endedness="paired"
 
 #=== Boiler plate for job logging ==============================================
 now() {
@@ -33,12 +32,12 @@ echo $(now) Starting $(basename "${BASH_SOURCE}")
 ${SCRIPTS}/scripts_info.sh || true
 #===============================================================================
 
+#endedness="paired"
 endedness="single" 
-
 genome="${1:-mm39}"
 echo $genome
 
-workingdir="$(pwd)"
+
 
 #Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
 if [ "$genome" == "mm9" ] || [ "$genome" == "mm10" ] || [ "$genome" == "mm39" ]; then 
@@ -52,20 +51,8 @@ fi ;
 ref_genome="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome"
 
 #Model name is the folder name
+workingdir="$(pwd)"
 model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
-
-#move to directory
-
-echo "----------------- Bowtie2 Alignment for ChIP ----------------- " ;
-echo
-echo "Analysis started: $Start_time" ;
-echo
-echo "Current working directory is: "$workingdir" "
-echo
-echo "Genome Bowtie2 index: "$species" "$genome" "
-echo
-echo "Sample: "${model}" "
-echo
 
 module purge #Unloads all modules from the users environment
 #Initialise the required modules/packages for analysis.
@@ -88,6 +75,14 @@ echo "SRA ids: "${sra_ids[@]}
 echo "Replicate names: "${repl[@]}
 echo "ref_genome: ${ref_genome}"
 
+# Set extended read length for single-end reads
+if [[ "${endedness}" == "single" ]]; then
+    ext_readlength="200"
+else    
+    ext_readlength=""
+fi
+
+## Pipeline stesp ==============================================================
 #        bowtie2 -k 2 -N 1 -p 4 -U  $repl \
 #        bowtie2 -k 2 -N 1 -p 4  --sra-acc SRR5453542 \
 #        bowtie2 -k 2 -N 1 -p 4   -1 ${repl}_R1.fastq.gz -2 ${repl}_R2.fastq.gz \
@@ -136,7 +131,7 @@ fi
     echo "$(now) Calling bamCoverage for ${repl}"
     bamCoverage --bam "${repl}.bam" \
             -o "${repl}.bw" \
-            --extendReads \
+            --extendReads ${ext_readlength} \
             -bs 1 \
             --normalizeUsing RPKM
 done
