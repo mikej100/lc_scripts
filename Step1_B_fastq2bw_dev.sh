@@ -3,7 +3,7 @@
 ###SBATCH --job-name=SRA
 #SBATCH --ntasks=5
 #SBATCH --mem=10G
-#SBATCH --time=00-10:00:00
+#SBATCH --time=00-30:00:00
 #SBATCH --output=slurm/%j_%x.out 
 #SBATCH --error=slurm/%j_%x.out
 ###SBATCH --mail-user=
