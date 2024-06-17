@@ -58,7 +58,7 @@ echo "$(now) Chromosome sizes: ${chr_sizes}"
 echo "$(now) Model: ${output_file}"
 wigToBigWig "$output_file".temp.wig $chr_sizes  "$output_file".bw
 # 
-# rm "$output_file".temp.wig
+rm "$output_file".temp.wig
 # 
  echo "$(now)Finished"
  echo 
