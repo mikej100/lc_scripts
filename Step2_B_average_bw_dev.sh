@@ -10,23 +10,19 @@
 # mamba activate bed_sam_deep_tools
 
 
-chr_sizes_mm9="/databank/igenomes/Mus_musculus/UCSC/mm9/Sequence/WholeGenomeFasta/chr_sizes.txt"
-chr_sizes_mm39="/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/WholeGenomeFasta/chr_sizes.txt"
-chr_sizes=$chr_sizes_mm39
-
-source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
-
+#=== Boiler plate for job logging ==============================================
 now() {
     date +"%Y-%m-%dT%T"
 }
-
 echo $(now) Starting $(basename "${BASH_SOURCE}")
 # Show git info for scripts folder
-#${SCRIPTS}/scripts_info.sh || true
+${SCRIPTS}/scripts_info.sh || true
+#===============================================================================
 
-echo "$(now) DEBUG returned to main script"
-
-
+#==================== Configuration section ====================================
+chr_sizes_mm9="/databank/igenomes/Mus_musculus/UCSC/mm9/Sequence/WholeGenomeFasta/chr_sizes.txt"
+chr_sizes_mm39="/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/WholeGenomeFasta/chr_sizes.txt"
+chr_sizes=$chr_sizes_mm39
 #Model name is the folder name
 model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
 
@@ -38,29 +34,29 @@ model=$(echo $(pwd) | awk -F/ '{print $NF}') ;
 # sbatch bigwig_averaging_wiggle.sh APHSpleen_Ter119_ATAC_averaged.bs1.rpkm.bw APHSpleen_Ter119_ATAC_rep1.bs1.rpkm.bw APHSpleen_Ter119_ATAC_rep2.bs1.rpkm.bw
 
 
-# Read SRA_ids from a a config file. One per line.
-mapfile -t sra_ids < sra_ids.cfg
-echo "SRA ids: "${sra_ids[@]}
-output_file="$model"
+# Read replicate filenames from a a config file. One per line.
+mapfile -t repl < replicate_names.cfg
+echo "Replicate names: "${repl[@]}
 
-fnames=$(printf %s.bw" " "${sra_ids[@]}")
-
-# 
-# file_1="$2"
-# file_2="$3"
-# file_3="$4"
-# 
+fnames=$(printf %s.bw" " "${repl[@]}")
 echo "Input bigwigs : $fnames"
+
+module purge
+source /project/higgslab/lcornell/mamba_installation/conda/bin/activate bed_sam_deep_tools
 # 
 echo "$(now) Starting Wiggletools mean"
+output_file="$model"
 wiggletools mean ${fnames} > "$output_file".temp.wig 
 # 	wiggletools mean "$file_1" "$file_2" > "$output_file".temp.wig
 # else
 # 	wiggletools mean "$file_1" "$file_2" "$file_3" > "$output_file".temp.wig
 # fi ;
 # 
+
 echo "$(now) Starting wigToBigWig"
-wigToBigWig "$output_file".temp.wig $chr_sizes "$output_file" ]
+echo "$(now) Chromosome sizes: ${chr_sizes}"
+echo "$(now) Model: ${output_file}"
+wigToBigWig "$output_file".temp.wig $chr_sizes  "$output_file".bw
 # 
 # rm "$output_file".temp.wig
 # 
