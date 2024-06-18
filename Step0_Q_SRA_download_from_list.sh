@@ -5,6 +5,7 @@
 #SBATCH --ntasks=4
 #SBATCH --mem=12G
 #SBATCH --time=00-10:00:00
+# mod made in old clone
 
 # Download SRA files specified by list in current folder
 # ======================================================
