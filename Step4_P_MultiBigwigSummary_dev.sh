@@ -3,7 +3,6 @@
 #SBATCH --output=slurm/%j_%x.out 
 #SBATCH --error=slurm/%j_%x.out
 #SBATCH --export=SCRIPTS
-#SBATCH --export=TEST_VAR="test value"
 
 # Instructions to run
 # Create directory for he analysis at the same level as the models
