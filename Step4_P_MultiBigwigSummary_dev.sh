@@ -2,7 +2,6 @@
 #SBATCH --partition=short
 #SBATCH --output=slurm/%j_%x.out 
 #SBATCH --error=slurm/%j_%x.out
-#SBATCH --export=SCRIPTS
 
 # Instructions to run
 # Create directory for he analysis at the same level as the models
