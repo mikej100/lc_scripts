@@ -8,6 +8,7 @@
 #SBATCH --error=slurm/%j_%x.out
 ###SBATCH --mail-user=
 ##SBATCH --mail-type=fail
+# New line by Mike 20240619T1705
 # Based on ChiiP_ATAC_pipeline_Bowtie2_fast.sh script from Lucy Cornell, modified by Mike Jennings for use with
 # lanceotron.
 # Changes are:
