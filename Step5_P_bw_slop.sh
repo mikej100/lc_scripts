@@ -8,16 +8,6 @@
 #SBATCH --error=slurm/%j_%x.out
 ###SBATCH --mail-user=
 ##SBATCH --mail-type=fail
-# New line by Mike 20240619T1705
-# Based on ChiiP_ATAC_pipeline_Bowtie2_fast.sh script from Lucy Cornell, modified by Mike Jennings for use with
-# lanceotron.
-# Changes are:
-#       not having 8x lane fastq from same samples. 
-#          I need to understand this requirement
-#       skipped the bamCoverage, as this step is in next script.
-####### If you want to mask blacklist regions, see line 190 
-
-####### To RUN: sbatch ChiP_ATAC_pipeline_Bowtie2_fast.sh <genome>
 
 ###############################################################################
 #                         Get command line options
@@ -27,10 +17,10 @@ usage() {
     echo "Options:"
     echo "  -g          Genome alignment. Default is mm39"
     echo "  -h          Display this help message"
-    echo "  -r          select replicates to process, by postion. "
-    echo "              comma delimited no spaces. E.g. -r 2,3 "
-    echo "              Default is all items in config file."
-    echo "  -U          Unpaired read (single-ended). Default is paired."
+#    echo "  -r          select replicates to process, by postion. "
+#    echo "              comma delimited no spaces. E.g. -r 2,3 "
+#    echo "              Default is all items in config file."
+    echo "  -s          Slop distance: bp to add to each end of region"
     echo "  -V          very verbose: print every command line"
 }
 # Defaults
@@ -38,14 +28,11 @@ endedness="paired"
 genome="mm39"
 
 # Parse options using getopts
-while getopts "hr:Uv" option; do
+while getopts "hs:V" option; do
     case "${option}" in
         g)  genome=($OPTARG)
             ;;
-        r)  IFS=,
-            repl_indices=($OPTARG)
-            ;;
-        U)  endedness="single"
+        s)  slop=($OPTARG)
             ;;
         h)  # Help option
             usage
@@ -65,8 +52,7 @@ shift $(($OPTIND - 1))
 ###############################################################################
 echo "Options settings:"
 echo "  genome: ${genome}"
-echo "  endedness: ${endedness}"
-echo "  replicate indices: ${repl_indices[@]}"
+echo "  slop: ${slop}"
 echo "  Remaining arguments read: $*"
 echo 
 ###############################################################################
@@ -85,11 +71,6 @@ ${SCRIPTS}/scripts_info.sh || true
 #Model name is the folder name
 model="$(basename $PWD)"
 
-# Read configuration data
-mapfile -t repl < replicate_names.cfg
-echo "Replicate names: "${repl[@]}
-
-#Generally, genome will be genome will be mm10 or hg19. Can use if statement to set correct species based on genome build.
 if [ "$genome" == "mm9" ] || [ "$genome" == "mm10" ] || [ "$genome" == "mm39" ]; then 
         species="Mus_musculus"
 elif [ "$genome" == "hg19" ] || [ "$genome" == "hg38" ] ; then 
@@ -99,11 +80,11 @@ else
 	exit
 fi
 ref_genome="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome"
-echo "ref_genome: ${ref_genome}"
+chr_sizes="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/WholeGenomeFasta/chr_sizes.txt"
+echo "chr_sizes: ${chr_sizes}"
 
 module purge #Unloads all modules from the users environment
 #Initialise the required modules/packages for analysis.
-module load samtools/1.17 bowtie2/2.4.2 bedtools/2.25.0 ucsctools/385 trim_galore/0.6.10 flash/1.2.11;
 module list #Prints list of modules and versions
 
 
