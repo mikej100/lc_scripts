@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=long
 #SBATCH --ntasks=5
-#SBATCH --mem=10G
+#SBATCH --mem=30G
 #SBATCH --time=00-03:00:00  #Usually runs in <5 min for two files
 #SBATCH --output=slurm/%j_%x.out 
 #SBATCH --error=slurm/%j_%x.out
