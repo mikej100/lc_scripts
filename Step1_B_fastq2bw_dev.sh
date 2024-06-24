@@ -151,35 +151,35 @@ fi
 
 for ir in ${!repl[@]}; do
     echo "Loop for item ${ir}"
-    #--if [[ "${endedness}" == "single" ]]; then
-    #--    echo "$(now) Calling bowtie for ${fq_name[$ir]} as single-ended data"
-    #--    bowtie2 -k 2 -N 1 -p 4 -U  "${fq_name[$ir]}.fastq.gz" \
-    #--        --maxins 1000 \
-    #--        -x $ref_genome \
-    #--        -S ${repl[$ir]}_alignment.sam
-    #--else
-    #--    echo "$(now) Calling bowtie for ${fq_name[$ir]} as pair-ended data"
-#   #--     bowtie2 -k 2 -N 1 -p 4  --sra-acc ${repl[$ir]}
-    #--    bowtie2 -k 2 -N 1 -p 4 \
-    #--        -1 ${fq_name[$ir]}_R1.fastq.gz -2 ${fq_name[$ir]}_R2.fastq.gz \
-    #--        --maxins 1000 \
-    #--        -x $ref_genome \
-    #--        -S ${repl[$ir]}_alignment.sam
-    #--fi
-    #--    #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
+    if [[ "${endedness}" == "single" ]]; then
+        echo "$(now) Calling bowtie for ${fq_name[$ir]} as single-ended data"
+        bowtie2 -k 2 -N 1 -p 4 -U  "${fq_name[$ir]}.fastq.gz" \
+            --maxins 1000 \
+            -x $ref_genome \
+            -S ${repl[$ir]}_alignment.sam
+    else
+        echo "$(now) Calling bowtie for ${fq_name[$ir]} as pair-ended data"
+#        bowtie2 -k 2 -N 1 -p 4  --sra-acc ${repl[$ir]}
+        bowtie2 -k 2 -N 1 -p 4 \
+            -1 ${fq_name[$ir]}_R1.fastq.gz -2 ${fq_name[$ir]}_R2.fastq.gz \
+            --maxins 1000 \
+            -x $ref_genome \
+            -S ${repl[$ir]}_alignment.sam
+    fi
+        #Filter the mapped reads (filtering the mapped reads from unmapped) see https://www.htslib.org/doc/samtools-view.html for the explaination of flags.
 
-    #--echo "$(now) Calling samtools::view for ${repl[$ir]}"
-    #--    samtools view -@8 -bS -F4 -o ${repl[$ir]}_mapped.bam ${repl[$ir]}_alignment.sam ;
+    echo "$(now) Calling samtools::view for ${repl[$ir]}"
+        samtools view -@8 -bS -F4 -o ${repl[$ir]}_mapped.bam ${repl[$ir]}_alignment.sam ;
 
-    #--    #Sort the reads in mapped.bam by coordinate.
-    #--echo "$(now) Calling samtools::sort for ${repl[$ir]}"
-    #--    samtools sort ${repl[$ir]}_mapped.bam -@8 -o ${repl[$ir]}_mapped.srtC ;
-    #--    rm -rf ${repl[$ir]}_mapped.bam
+        #Sort the reads in mapped.bam by coordinate.
+    echo "$(now) Calling samtools::sort for ${repl[$ir]}"
+        samtools sort ${repl[$ir]}_mapped.bam -@8 -o ${repl[$ir]}_mapped.srtC ;
+        rm -rf ${repl[$ir]}_mapped.bam
 
-    #--    #Remove PCR duplicates.
-    #--echo "$(now) Calling samtools::rmdup for ${repl[$ir]}"
-    #--    samtools rmdup ${repl[$ir]}_mapped.srtC ${repl[$ir]}_filtered.bam ; 
-    #--    rm -rf ${repl[$ir]}_mapped.srtC *.txt *.histogram *.hist
+        #Remove PCR duplicates.
+    echo "$(now) Calling samtools::rmdup for ${repl[$ir]}"
+        samtools rmdup ${repl[$ir]}_mapped.srtC ${repl[$ir]}_filtered.bam ; 
+        rm -rf ${repl[$ir]}_mapped.srtC *.txt *.histogram *.hist
 
     #--    #Index the bam file
     #--echo "$(now) Calling samtools::index for ${repl[$ir]}"
