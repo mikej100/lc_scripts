@@ -85,7 +85,7 @@ fi
 ref_genome="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/Bowtie2Index/genome"
 chr_sizes="/databank/igenomes/"$species"/UCSC/"$genome"/Sequence/WholeGenomeFasta/chr_sizes.txt"
 echo "chr_sizes: ${chr_sizes}"
-
+#/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/WholeGenomeFasta/chr_sizes.txt
 ################################################################################
 #                           Set up modules 
 module purge #Unloads all modules from the users environment
@@ -99,11 +99,12 @@ module load bedtools2/2.27.1
 # Run bedtools slop to increase size of regions for subsequent coverage counts
 # Expand in both directions by given number of base pairs.
 
-inputf="Lanceotron_output/L-tron_toppeaks"
+inputf="Lanceotron_output/${model}_L-tron_toppeaks"
 
+echo "Calling bedtools slop for ${inputf}.bed"
 bedtools slop \
         -i ${inputf}.bed \
-        -g $genome \
+        -g ${chr_sizes} \
         -b ${slop} \
         > "${inputf}_slop${slop}.bed"
 
