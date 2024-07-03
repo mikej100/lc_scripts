@@ -45,6 +45,6 @@ multiBigwigSummary BED-file \
         "../H3K4me3/H3K4me3.bw" \
      -o ${out_file}.npz \
      --outRawCounts ${out_file}.tab \
-     --labels H3K4Me1 H3K4Me3 \
+     --labels H3K4me1 H3K4me3 \
      --BED $bed_filename
 # 
