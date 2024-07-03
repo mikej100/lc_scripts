@@ -13,13 +13,11 @@
 #                         Get command line options
 # Function to display help text
 usage() {
-    echo "Usage: $(basename $0) [-r N,...] [-U] "
+    echo "Utility to extend regions in .bed file by given number of base pairs"
+    echo "Usage: $(basename $0) -s <bp> [-gV]"
     echo "Options:"
     echo "  -g          Genome alignment. Default is mm39"
     echo "  -h          Display this help message"
-#    echo "  -r          select replicates to process, by postion. "
-#    echo "              comma delimited no spaces. E.g. -r 2,3 "
-#    echo "              Default is all items in config file."
     echo "  -s          Slop distance: bp to add to each end of region"
     echo "  -V          very verbose: print every command line"
 }
@@ -90,8 +88,7 @@ echo "chr_sizes: ${chr_sizes}"
 #                           Set up modules 
 module purge #Unloads all modules from the users environment
 module load bedtools2/2.27.1
-# module list #Prints list of modules and versions
-
+module load ucsctools/385
 
 ################################################################################
 #                       Run process steps
@@ -108,6 +105,16 @@ bedtools slop \
         -b ${slop} \
         > "${inputf}_slop${slop}.bed"
 
+echo "$(now) Starting sort for ${inputf}_slop${slop}.bed"
+sort -k1,1 -k2,2n \
+	"${inputf}_slop${slop}.bed" > \
+	"${inputf}_slop${slop}.sorted.bed"
+
+echo "$(now) Starting bedToBigBed for ${inputf}_slop${slop}.sorted.bed$"
+bedToBigBed \
+	${inputf}_slop${slop}.sorted.bed \
+ 	$chr_sizes \
+	${inputf}_slop${slop}.bb 
 echo
 echo -e "$(now) Process steps complete"
 echo
